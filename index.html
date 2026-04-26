@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Mobile Screen Builder</title>
+  <style>
+    :root{--bg:#0f172a;--panel:#111827;--card:#1f2937;--muted:#94a3b8;--line:#334155;--accent:#38bdf8;--text:#f8fafc;--phone:#020617}
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#020617,#111827);color:var(--text)}
+    .app{min-height:100vh;display:grid;grid-template-columns:320px 1fr 320px;gap:16px;padding:16px}.panel{background:rgba(15,23,42,.92);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+    h1{font-size:20px;margin:0 0 12px}.section{margin:14px 0}.section h2{font-size:14px;color:#cbd5e1;margin:0 0 8px}.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tool,button{border:1px solid var(--line);background:#172033;color:var(--text);border-radius:12px;padding:10px;cursor:pointer}.tool:hover,button:hover{border-color:var(--accent)}
+    label{display:block;font-size:12px;color:#cbd5e1;margin:10px 0 5px} input,textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;background:#020617;color:var(--text);padding:9px} textarea{min-height:72px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.canvasWrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 32px)}
+    .phone{width:390px;height:844px;background:var(--phone);border:10px solid #111827;border-radius:44px;position:relative;overflow:hidden;box-shadow:0 28px 90px rgba(0,0,0,.55)}.notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:120px;height:28px;background:#000;border-radius:18px;z-index:5}.screen{position:absolute;inset:0;padding:54px 18px 22px;background:#f8fafc;color:#111827;overflow:auto}.el{position:relative;margin:10px 0;border:2px dashed transparent;border-radius:14px}.el.selected{border-color:#0ea5e9}.el .x{position:absolute;top:-10px;left:-10px;background:#ef4444;color:white;border:0;border-radius:50%;width:24px;height:24px;padding:0;display:none}.el.selected .x{display:block}.hero{padding:22px;border-radius:22px;background:linear-gradient(135deg,#e0f2fe,#bae6fd)}.card{padding:16px;border-radius:18px;background:white;box-shadow:0 8px 24px rgba(15,23,42,.12)}.btn{display:inline-block;width:100%;padding:14px;border-radius:14px;background:#0ea5e9;color:white;text-align:center;font-weight:700}.img{height:150px;border-radius:18px;background:linear-gradient(135deg,#cbd5e1,#64748b);display:grid;place-items:center;color:white}.nav{display:flex;justify-content:space-around;padding:12px;border-radius:20px;background:#111827;color:white}.small{font-size:12px;color:var(--muted)}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ltr{direction:ltr;text-align:left}
+    @media(max-width:1050px){.app{grid-template-columns:1fr}.canvasWrap{min-height:auto}.phone{width:min(390px,94vw);height:760px}.panel{order:2}.canvasWrap{order:1}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="panel">
+      <h1>منشئ شاشة الجوال</h1>
+      <div class="section"><h2>الأدوات</h2><div class="tools">
+        <button class="tool" data-type="title">عنوان</button><button class="tool" data-type="text">نص</button><button class="tool" data-type="button">زر</button><button class="tool" data-type="input">حقل إدخال</button><button class="tool" data-type="card">بطاقة</button><button class="tool" data-type="image">صورة</button><button class="tool" data-type="hero">واجهة Hero</button><button class="tool" data-type="nav">شريط تنقل</button>
+      </div></div>
+      <div class="section"><h2>إجراءات</h2><div class="actions"><button id="clear">مسح</button><button id="export">تصدير HTML</button><button id="save">حفظ محلي</button><button id="load">استرجاع</button></div></div>
+      <p class="small">اضغط على أي عنصر داخل الشاشة لتعديله أو حذفه.</p>
+    </aside>
+    <section class="canvasWrap"><div class="phone"><div class="notch"></div><div id="screen" class="screen"></div></div></section>
+    <aside class="panel">
+      <h1>خصائص العنصر</h1>
+      <div id="empty" class="small">لم يتم تحديد عنصر.</div>
+      <div id="props" hidden>
+        <label>النص</label><textarea id="pText"></textarea>
+        <div class="row"><div><label>حجم الخط</label><input id="pSize" type="number" min="8" max="60"></div><div><label>الاستدارة</label><input id="pRadius" type="number" min="0" max="40"></div></div>
+        <div class="row"><div><label>لون النص</label><input id="pColor" type="color"></div><div><label>الخلفية</label><input id="pBg" type="color"></div></div>
+        <label>محاذاة</label><select id="pAlign"><option value="right">يمين</option><option value="center">وسط</option><option value="left">يسار</option></select>
+        <label>رابط/Placeholder</label><input id="pExtra" placeholder="اختياري">
+      </div>
+    </aside>
+  </main>
+<script>
+const screen=document.getElementById('screen');let selected=null;
+const templates={title:'<h2>عنوان الشاشة</h2>',text:'<p>نص وصفي قابل للتعديل.</p>',button:'<div class="btn">ابدأ الآن</div>',input:'<input placeholder="اكتب هنا">',card:'<div class="card"><b>بطاقة محتوى</b><p>تفاصيل مختصرة.</p></div>',image:'<div class="img">صورة</div>',hero:'<div class="hero"><h2>تطبيقك القادم</h2><p>ابنِ تجربة جوال بسرعة.</p></div>',nav:'<div class="nav"><span>الرئيسية</span><span>بحث</span><span>حسابي</span></div>'};
+document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>addEl(b.dataset.type));
+function addEl(type){const wrap=document.createElement('div');wrap.className='el';wrap.dataset.type=type;wrap.innerHTML='<button class="x">×</button>'+templates[type];wire(wrap);screen.appendChild(wrap);select(wrap)}
+function wire(el){el.onclick=e=>{e.stopPropagation();if(e.target.className==='x'){el.remove();selected=null;syncProps();return}select(el)}}
+function select(el){document.querySelectorAll('.el').forEach(x=>x.classList.remove('selected'));selected=el;el.classList.add('selected');syncProps()}
+screen.onclick=()=>{selected=null;document.querySelectorAll('.el').forEach(x=>x.classList.remove('selected'));syncProps()};
+function inner(){return selected?.querySelector(':scope > :not(.x)')}
+function syncProps(){const on=!!selected;props.hidden=!on;empty.hidden=on;if(!on)return;const n=inner();pText.value=n.innerText||n.value||n.placeholder||'';pSize.value=parseInt(getComputedStyle(n).fontSize)||16;pRadius.value=parseInt(getComputedStyle(n).borderRadius)||0;pColor.value=rgb2hex(getComputedStyle(n).color);pBg.value=rgb2hex(getComputedStyle(n).backgroundColor);pAlign.value=getComputedStyle(n).textAlign||'right';pExtra.value=n.href||n.placeholder||''}
+[pText,pSize,pRadius,pColor,pBg,pAlign,pExtra].forEach(i=>i.oninput=apply);
+function apply(){if(!selected)return;const n=inner();if(n.tagName==='INPUT'){n.placeholder=pText.value||pExtra.value}else n.innerText=pText.value;n.style.fontSize=pSize.value+'px';n.style.borderRadius=pRadius.value+'px';n.style.color=pColor.value;n.style.backgroundColor=pBg.value;n.style.textAlign=pAlign.value;if(n.tagName==='INPUT')n.placeholder=pExtra.value||pText.value}
+function rgb2hex(rgb){const m=rgb.match(/\d+/g);if(!m)return '#000000';return '#'+m.slice(0,3).map(x=>(+x).toString(16).padStart(2,'0')).join('')}
+clear.onclick=()=>{screen.innerHTML='';selected=null;syncProps()};save.onclick=()=>localStorage.setItem('mobileBuilder',screen.innerHTML);load.onclick=()=>{screen.innerHTML=localStorage.getItem('mobileBuilder')||'';screen.querySelectorAll('.el').forEach(wire)};
+export.onclick=()=>{const html='<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><body>'+screen.innerHTML.replaceAll('<button class="x">×</button>','')+'</body></html>';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download='mobile-screen.html';a.click()};
+addEl('hero');addEl('card');addEl('button');
+</script>
+</body>
+</html>
