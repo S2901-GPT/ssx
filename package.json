@@ -2,7 +2,7 @@
   "name": "google-labs-studio",
   "version": "1.0.0",
   "scripts": {
-    "build": "echo 'No build step required for this project'"
+    "build": "echo 'No build step required'"
   },
   "dependencies": {
     "@google/generative-ai": "^0.11.0"
