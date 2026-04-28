@@ -12,7 +12,9 @@ module.exports = async function handler(req, res) {
     try {
         // الخطوة 1: استخدام Gemini لهندسة البرومبت
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        
+        // تم تغيير اسم النموذج هنا إلى gemini-pro لحل مشكلة 404
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
         
         const aiInstruction = `أنت خبير محترف في كتابة أوامر (Prompts) لمولدات الصور المتقدمة مثل Midjourney.
 مهمتك: خذ الفكرة البسيطة التالية من المستخدم، وحولها إلى Prompt احترافي باللغة الإنجليزية فقط.
@@ -25,9 +27,10 @@ module.exports = async function handler(req, res) {
         const enhancedPrompt = await result.response.text();
 
         // الخطوة 2: تمرير البرومبت الاحترافي لمحرك توليد الصور
-        const seed = Math.floor(Math.random() * 1000000);
+        const seed = Math.floor(Math.random() * 1000000); 
         const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(enhancedPrompt.trim())}?width=1024&height=1024&seed=${seed}&nologo=true`;
 
+        // إرسال البرومبت المطور ورابط الصورة النهائي للواجهة
         res.status(200).json({ 
             enhancedPrompt: enhancedPrompt.trim(), 
             imageUrl: imageUrl 
