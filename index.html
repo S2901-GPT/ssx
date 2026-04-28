@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Labs Studio | استوديو الإبداع</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background: #050505; color: #fff; overflow-x: hidden; }
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glow { box-shadow: 0 0 50px rgba(66, 133, 244, 0.15); }
+        .gradient-text { background: linear-gradient(135deg, #4285F4, #34A853, #FBBC05, #EA4335); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-6 md:p-12">
+
+    <nav class="w-full max-w-6xl flex justify-between items-center mb-16 animate-fade-in">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg">
+                <svg viewBox="0 0 24 24" class="w-6 h-6"><path fill="#4285F4" d="M21.35 11.1h-9.17v2.73h6.51c-.3 1.56-1.25 2.51-2.61 3.12l4.22 3.25c2.47-2.28 3.9-5.63 3.9-9.1z"/><path fill="#34A853" d="M12.18 21c2.43 0 4.47-.8 5.96-2.18l-4.22-3.25c-1.1.74-2.52 1.18-4.04 1.18-3.1 0-5.73-2.09-6.67-4.9H1.1v3.28C2.59 18.04 7.04 21 12.18 21z"/><path fill="#FBBC05" d="M5.51 11.85c-.24-.72-.38-1.48-.38-2.27s.14-1.55.38-2.27V4.03H1.1C.4 5.43 0 7.01 0 8.68s.4 3.25 1.1 4.65l4.41-1.48z"/><path fill="#EA4335" d="M12.18 3.9c1.32 0 2.5.45 3.44 1.35l2.58-2.58C16.65 1.13 14.61.35 12.18.35c-5.14 0-9.59 2.96-11.08 7.23l4.41 1.48c.94-2.81 3.57-4.9 6.67-4.9z"/></svg>
+            </div>
+            <span class="text-xl font-black tracking-tighter">Google Labs <span class="font-light text-slate-500">Studio</span></span>
+        </div>
+        <div class="glass px-5 py-2 rounded-full text-xs font-bold text-slate-400">v2.0 Beta</div>
+    </nav>
+
+    <div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <div class="lg:col-span-7 flex flex-col gap-6">
+            <div class="glass glow p-8 rounded-[3rem] space-y-8">
+                <div class="space-y-2">
+                    <h2 class="text-3xl font-black gradient-text">ابدأ الإبداع الآن</h2>
+                    <p class="text-slate-500">ارفع وسائطك واطلب من الذكاء الاصطناعي معالجتها.</p>
+                </div>
+
+                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="relative border-2 border-dashed border-white/5 rounded-[2rem] p-12 text-center transition-all hover:border-blue-500/50 hover:bg-white/[0.02] cursor-pointer group">
+                    <input type="file" id="file-input" class="hidden" accept="image/*,video/*">
+                    <div id="preview-area" class="hidden absolute inset-0 rounded-[2rem] overflow-hidden bg-black z-10">
+                        <img id="img-prev" class="w-full h-full object-contain hidden">
+                        <video id="vid-prev" class="w-full h-full object-contain hidden" controls></video>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition text-2xl">📸</div>
+                        <p class="text-slate-400 font-medium">اسحب الصورة أو الفيديو هنا</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <textarea id="prompt-input" rows="3" class="w-full bg-white/5 border border-white/5 rounded-2xl p-5 text-lg outline-none focus:ring-2 focus:ring-blue-500/50 transition-all resize-none" placeholder="اطلب أي تعديل أو تحليل للمحتوى..."></textarea>
+                    
+                    <button onclick="runAI()" id="run-btn" class="w-full bg-white text-black py-5 rounded-2xl font-black text-xl hover:bg-blue-500 hover:text-white transition-all flex items-center justify-center gap-3 shadow-xl">
+                        <span>تنفيذ الأمر</span>
+                        <div id="loading" class="loader hidden"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-5 flex flex-col gap-6">
+            <div class="glass p-8 rounded-[3rem] h-full min-h-[400px] flex flex-col relative overflow-hidden">
+                <h3 class="text-lg font-bold text-slate-400 mb-6">النتيجة النهائية</h3>
+                
+                <div id="empty-state" class="flex-grow flex flex-col items-center justify-center text-center space-y-4">
+                    <div class="text-5xl opacity-20">✨</div>
+                    <p class="text-slate-600 max-w-[200px]">ستظهر نتائج تحليل ومعالجة قوقل لابس هنا</p>
+                </div>
+
+                <div id="result-content" class="hidden text-slate-200 leading-relaxed text-lg bg-white/5 p-6 rounded-2xl border border-white/5 whitespace-pre-wrap"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const previewArea = document.getElementById('preview-area');
+        const imgPrev = document.getElementById('img-prev');
+        const vidPrev = document.getElementById('vid-prev');
+        let base64Data = null;
+
+        fileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (f) => {
+                base64Data = f.target.result;
+                previewArea.classList.remove('hidden');
+                if (file.type.startsWith('image/')) {
+                    imgPrev.src = base64Data; imgPrev.classList.remove('hidden'); vidPrev.classList.add('hidden');
+                } else {
+                    vidPrev.src = base64Data; vidPrev.classList.remove('hidden'); imgPrev.classList.add('hidden');
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+
+        async function runAI() {
+            const prompt = document.getElementById('prompt-input').value;
+            const btn = document.getElementById('run-btn');
+            const loader = document.getElementById('loading');
+            const resultBox = document.getElementById('result-content');
+            const emptyState = document.getElementById('empty-state');
+
+            if (!prompt) return alert('الرجاء كتابة أمر للذكاء الاصطناعي');
+
+            btn.disabled = true; loader.classList.remove('hidden');
+            resultBox.classList.add('hidden'); emptyState.classList.remove('hidden');
+
+            try {
+                const res = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ prompt, fileData: base64Data })
+                });
+                const data = await res.json();
+                
+                if(res.ok) {
+                    emptyState.classList.add('hidden');
+                    resultBox.classList.remove('hidden');
+                    resultBox.innerText = data.text;
+                } else {
+                    alert('خطأ: ' + data.error);
+                }
+                
+            } catch (e) {
+                alert('عذراً، حدث خطأ في معالجة طلبك.');
+            } finally {
+                btn.disabled = false; loader.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
