@@ -3,16 +3,14 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send();
 
-    // التأكد من وجود مفتاح API
     if (!process.env.GEMINI_API_KEY) {
-        return res.status(500).json({ error: "مفتاح GEMINI_API_KEY مفقود في إعدادات Vercel" });
+        return res.status(500).json({ error: "مفتاح GEMINI_API_KEY مفقود" });
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const { prompt, fileData } = req.body;
 
     try {
-        // استخدام النموذج الحقيقي والأقوى من جوجل
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
         
         let parts = [{ text: prompt }];
