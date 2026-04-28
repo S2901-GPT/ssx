@@ -1,15 +1,19 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send();
 
-    // تأكد من إضافة GEMINI_API_KEY في إعدادات Vercel
+    // التأكد من وجود مفتاح API
+    if (!process.env.GEMINI_API_KEY) {
+        return res.status(500).json({ error: "مفتاح GEMINI_API_KEY مفقود في إعدادات Vercel" });
+    }
+
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const { prompt, fileData } = req.body;
 
     try {
-        // تم الترقية هنا إلى محرك Nano Banana Pro (Gemini 3 Pro Image)
-        const model = genAI.getGenerativeModel({ model: "gemini-3-pro-image-preview" });
+        // استخدام النموذج الحقيقي والأقوى من جوجل
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
         
         let parts = [{ text: prompt }];
         
@@ -26,6 +30,7 @@ export default async function handler(req, res) {
         res.status(200).json({ text: response.text() });
         
     } catch (error) {
+        console.error("Gemini API Error:", error);
         res.status(500).json({ error: error.message });
     }
 }
