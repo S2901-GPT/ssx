@@ -3,15 +3,15 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send();
 
-    if (!process.env.Gemini_Api_Key) {
-        return res.status(500).json({ error: "Gemini_Api_Key is missing in Vercel." });
+    if (!process.env.Gemini_API_Key) {
+        return res.status(500).json({ error: "Gemini_API_Key is missing in Vercel." });
     }
 
     const { prompt } = req.body;
 
     try {
         // الخطوة 1: استخدام Gemini لهندسة البرومبت
-        const genAI = new GoogleGenerativeAI(process.env.Gemini_Api_Key);
+        const genAI = new GoogleGenerativeAI(process.env.Gemini_API_Key);
         
         // استخدام النموذج الأحدث لحل مشكلة 404 الخاصة بـ gemini-pro
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
