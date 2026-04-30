@@ -3,18 +3,18 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send();
 
-    if (!process.env.GEMINI_API_KEY) {
-        return res.status(500).json({ error: "GEMINI_API_KEY is missing in Vercel." });
+    if (!process.env.Gemini_Api_Key) {
+        return res.status(500).json({ error: "Gemini_Api_Key is missing in Vercel." });
     }
 
     const { prompt } = req.body;
 
     try {
         // الخطوة 1: استخدام Gemini لهندسة البرومبت
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const genAI = new GoogleGenerativeAI(process.env.Gemini_Api_Key);
         
-        // تم تغيير اسم النموذج هنا إلى gemini-pro لحل مشكلة 404
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        // استخدام النموذج الأحدث لحل مشكلة 404 الخاصة بـ gemini-pro
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         
         const aiInstruction = `أنت خبير محترف في كتابة أوامر (Prompts) لمولدات الصور المتقدمة مثل Midjourney.
 مهمتك: خذ الفكرة البسيطة التالية من المستخدم، وحولها إلى Prompt احترافي باللغة الإنجليزية فقط.
