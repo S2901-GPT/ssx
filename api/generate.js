@@ -14,7 +14,7 @@ module.exports = async function handler(req, res) {
         const genAI = new GoogleGenerativeAI(process.env.Gemini_Api_Key);
         
         // استخدام النموذج الأحدث لحل مشكلة 404 الخاصة بـ gemini-pro
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         
         const aiInstruction = `أنت خبير محترف في كتابة أوامر (Prompts) لمولدات الصور المتقدمة مثل Midjourney.
 مهمتك: خذ الفكرة البسيطة التالية من المستخدم، وحولها إلى Prompt احترافي باللغة الإنجليزية فقط.
